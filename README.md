@@ -1,5 +1,21 @@
 # IoniqHA
 
+> ⚠️ **Disclaimer:** Jde o neoficiální, experimentální hobby projekt jednoho
+> uživatele, nijak nesouvisející s Hyundai/Kia/LGE. Appka byla odladěná a
+> otestovaná na jednom konkrétním autě/firmwaru (Hyundai Ioniq Electric
+> 28kWh, LGE IVI head-unit) - na jiném roce výroby nebo jiné verzi
+> softwaru nemusí fungovat vůbec, nebo může při startu spadnout. Appka
+> jen čte data z vozidla, nic nezapisuje ani neovládá, ale používáš ji
+> čistě na vlastní riziko a bez jakékoli záruky.
+>
+> *This is an unofficial, experimental hobby project by a single user,
+> with no affiliation to Hyundai/Kia/LGE. The app was built and tested
+> against one specific car/firmware (Hyundai Ioniq Electric 28kWh, LGE IVI
+> head unit) - it may not work, or may crash on startup, on a different
+> model year or software version. The app only reads vehicle data, it
+> never writes to or controls anything, but it is provided as-is, use at
+> your own risk.*
+
 Minimalistická appka pro head-unit Hyundai Ioniq Electric (28kWh), inspirovaná
 projektem [ABRPTransmitter](https://github.com/g4rb4g3/ABRPTransmitter) od
 g4rb4g3. Místo posílání dat do ABRP posílá SoC (a pár dalších hodnot) rovnou
