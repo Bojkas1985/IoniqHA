@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="cz.ivica.ioniqha">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Pro načtení webhook URL ze souboru na USB flešce (ať se nemusí
+         ten dlouhý hash přepisovat na obrazovce auta). -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleInstance"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Dvojklik tlačítka EV na head-unitu otevře MainActivity. Stejný trik jako
+             u původního ABRPTransmitteru - firmware posílá tento broadcast systémově,
+             appka na něj jen reaguje. -->
+        <receiver
+            android:name=".receiver.ButtonReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.lge.ivi.action.KEY_EV" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Nastartuje službu po bootu head-unitu a zároveň předává pozici z vlastní
+             navigace vozu (GPS), pokud zrovna přišla. -->
+        <receiver
+            android:name=".receiver.VehicleBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.hkmc.telematics.gis.action.NAVI_GPS_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".service.IoniqHaService"
+            android:exported="false" />
+
+    </application>
+</manifest>

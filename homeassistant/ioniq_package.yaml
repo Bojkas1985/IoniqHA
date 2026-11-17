@@ -1,0 +1,130 @@
+# Home Assistant "package" pro příjem telemetrie z appky IoniqHA.
+#
+# Instalace:
+# 1. Zapni packages v configuration.yaml, pokud ještě nemáš:
+#      homeassistant:
+#        packages: !include_dir_named packages
+# 2. Tenhle soubor ulož jako packages/ioniq.yaml (nebo ho rovnou !include).
+# 3. V appce IoniqHA nastav webhook URL na:
+#      http://<IP tvého HA>:8123/api/webhook/ioniq-soc
+#    (webhook_id zůstává "ioniq-soc" i po přejmenování entit níže - měnit ho
+#    by znamenalo znovu přepisovat URL v appce na displeji auta.)
+# 4. Restartuj Home Assistant.
+#
+# Po restartu uvidíš entity pojmenované IoniqHA_..., např.:
+#   sensor.ioniqha_soc, sensor.ioniqha_speed, sensor.ioniqha_charging,
+#   sensor.ioniqha_ext_temp, sensor.ioniqha_power, sensor.ioniqha_dojezd,
+#   sensor.ioniqha_najezd, sensor.ioniqha_drive_mode, ...
+# (dřív se jmenovaly ioniq_... - pokud máš staré entity v dashboardu/
+# automatizacích, bude potřeba je tam přepsat na nové ioniqha_... názvy.)
+#
+# Poloha (lat/lon) chodí jen když appka zrovna má GPS z navigace vozu.
+#
+# Pozn. k novým polím (drive_mode, avg_efficiency, used_efficiency,
+# charge_limit_percent, range_add_km, battery_level, battery_percent_alt,
+# evse_fault_flag, driving_lockout, inner_temp): u drive_mode, spotřeby,
+# limitu nabíjení a doplňkového dojezdu jsme si přesahem signatur metod
+# dost jistí, u battery_level/battery_percent_alt/evse_fault_flag/
+# driving_lockout ne úplně - appka je posílá (když se to vozidla podaří
+# přečíst), ale přesný význam/jednotky si ověř až podle reálných hodnot.
+
+template:
+  - trigger:
+      - trigger: webhook
+        webhook_id: ioniq-soc
+        allowed_methods: [POST]
+        local_only: true
+    sensor:
+      - name: "IoniqHA last payload"
+        unique_id: ioniqha_last_payload
+        state: "{{ now().isoformat() }}"
+        attributes:
+          soc: "{{ trigger.json.soc }}"
+          speed: "{{ trigger.json.speed }}"
+          is_charging: "{{ trigger.json.is_charging }}"
+          ext_temp: "{{ trigger.json.ext_temp }}"
+          power: "{{ trigger.json.power }}"
+          range_km: "{{ trigger.json.range_km | default(none) }}"
+          odometer_km: "{{ trigger.json.odometer_km | default(none) }}"
+          lat: "{{ trigger.json.lat | default(none) }}"
+          lon: "{{ trigger.json.lon | default(none) }}"
+          drive_mode: "{{ trigger.json.drive_mode | default(none) }}"
+          avg_efficiency: "{{ trigger.json.avg_efficiency | default(none) }}"
+          used_efficiency: "{{ trigger.json.used_efficiency | default(none) }}"
+          charge_limit_percent: "{{ trigger.json.charge_limit_percent | default(none) }}"
+          range_add_km: "{{ trigger.json.range_add_km | default(none) }}"
+          battery_level: "{{ trigger.json.battery_level | default(none) }}"
+          battery_percent_alt: "{{ trigger.json.battery_percent_alt | default(none) }}"
+          evse_fault_flag: "{{ trigger.json.evse_fault_flag | default(none) }}"
+          driving_lockout: "{{ trigger.json.driving_lockout | default(none) }}"
+          inner_temp: "{{ trigger.json.inner_temp | default(none) }}"
+
+  - sensor:
+      - name: "IoniqHA SoC"
+        unique_id: ioniqha_soc
+        unit_of_measurement: "%"
+        device_class: battery
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'soc') }}"
+      - name: "IoniqHA rychlost"
+        unique_id: ioniqha_speed
+        unit_of_measurement: "km/h"
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'speed') }}"
+      - name: "IoniqHA nabíjení"
+        unique_id: ioniqha_charging
+        state: >
+          {{ 'Nabíjí se' if state_attr('sensor.ioniqha_last_payload', 'is_charging') == 1 else 'Nenabíjí se' }}
+      - name: "IoniqHA venkovní teplota"
+        unique_id: ioniqha_ext_temp
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'ext_temp') }}"
+      - name: "IoniqHA výkon"
+        unique_id: ioniqha_power
+        unit_of_measurement: "kW"
+        device_class: power
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'power') }}"
+      - name: "IoniqHA dojezd"
+        unique_id: ioniqha_dojezd
+        unit_of_measurement: "km"
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'range_km') }}"
+      - name: "IoniqHA nájezd"
+        unique_id: ioniqha_najezd
+        unit_of_measurement: "km"
+        state_class: total_increasing
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'odometer_km') }}"
+
+      # --- Nová pole doplněná 2026-11-17 ---
+      - name: "IoniqHA režim jízdy"
+        unique_id: ioniqha_drive_mode
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'drive_mode') }}"
+      - name: "IoniqHA průměrná spotřeba"
+        unique_id: ioniqha_avg_efficiency
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'avg_efficiency') }}"
+      - name: "IoniqHA aktuální spotřeba"
+        unique_id: ioniqha_used_efficiency
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'used_efficiency') }}"
+      - name: "IoniqHA limit nabíjení"
+        unique_id: ioniqha_charge_limit
+        unit_of_measurement: "%"
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'charge_limit_percent') }}"
+      - name: "IoniqHA doplňkový dojezd"
+        unique_id: ioniqha_range_add
+        unit_of_measurement: "km"
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'range_add_km') }}"
+      - name: "IoniqHA battery level (neověřeno)"
+        unique_id: ioniqha_battery_level
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'battery_level') }}"
+      - name: "IoniqHA battery percent alt (neověřeno)"
+        unique_id: ioniqha_battery_percent_alt
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'battery_percent_alt') }}"
+      - name: "IoniqHA EVSE fault flag (neověřeno)"
+        unique_id: ioniqha_evse_fault
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'evse_fault_flag') }}"
+      - name: "IoniqHA driving lockout (neověřeno)"
+        unique_id: ioniqha_driving_lockout
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'driving_lockout') }}"
+      - name: "IoniqHA vnitřní teplota"
+        unique_id: ioniqha_inner_temp
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'inner_temp') }}"

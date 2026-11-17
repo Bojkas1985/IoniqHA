@@ -1,0 +1,21 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Starší AGP (3.6.4, jako u ABRPTransmitteru) nové Android Studio
+        // odmítá otevřít (minimum je 7.3.0) - jedeme na novější AGP 7.4.2,
+        // která si ještě rozumí s compileSdk 28 / minSdk 17.
+        classpath 'com.android.tools.build:gradle:7.4.2'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        // com.github.bright:slf4android je na JitPacku, ne na Google/Maven Central.
+        maven { url 'https://jitpack.io' }
+    }
+}

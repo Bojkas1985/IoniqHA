@@ -1,0 +1,17 @@
+# Android / Gradle build výstupy a lokální IDE soubory - nepatří do repa,
+# generují se znovu při každém buildu a jsou specifické pro stroj.
+*.iml
+.gradle/
+.idea/
+local.properties
+/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+app/build/
+app/release/
+app/debug/
+
+# Gradle wrapper jar se stahuje automaticky při prvním ./gradlew - není
+# potřeba ho verzovat (gradle-wrapper.properties se stahuje přes něj).
+gradle/wrapper/gradle-wrapper.jar

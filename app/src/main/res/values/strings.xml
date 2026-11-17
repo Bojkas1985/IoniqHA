@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IoniqHA</string>
+    <string name="webhook_url_label">Home Assistant webhook URL</string>
+    <string name="webhook_url_hint">Lokální HA na stejné WiFi: http://IP:8123/api/webhook/ID. Vzdáleně přes Nabu Casa: https://&lt;hash&gt;.ui.nabu.casa/api/webhook/ID (vlastní Remote UI adresa + cesta webhooku).</string>
+    <string name="transmit_data_label">Posílat data</string>
+    <string name="save_label">Uložit</string>
+    <string name="load_from_usb_label">Načíst URL z USB (webhook_url.txt)</string>
+    <string name="send_now_label">Odeslat teď</string>
+    <string name="debug_status_label">Stav</string>
+    <string name="no_attempt_yet">Appka se ještě nepokusila nic odeslat.</string>
+    <string name="tab_settings_label">Nastavení</string>
+    <string name="tab_debug_label">Debug</string>
+</resources>
