@@ -13,6 +13,18 @@ straight to Home Assistant via a webhook. No OBD dongle, no phone, no ABRP
 account required - it reads directly from the LGE IVI framework already
 running on the head unit.*
 
+**Appka je hotová a funkční** - úspěšně otestovaná v reálném autě, čte a
+posílá reálná data (SoC, rychlost, nabíjení, teplota, výkon, dojezd,
+nájezd a další) do Home Assistanta na lokální WiFi síti. Zkompilovaný
+`.apk` ke stažení najdeš ve složce [`releases/`](releases/) (nebo si ho
+sestav sám podle návodu tamtéž).
+
+*The app is finished and working - successfully tested in a real car,
+reading and sending real data (SoC, speed, charging, temperature, power,
+range, odometer and more) to Home Assistant over the local WiFi network.
+A compiled `.apk` is available in the [`releases/`](releases/) folder (or
+build it yourself following the instructions there).*
+
 ## Screenshoty appky / App screenshots
 
 | Nastavení (CZ) / Settings (EN) | Debug (CZ) / Debug (EN) |
