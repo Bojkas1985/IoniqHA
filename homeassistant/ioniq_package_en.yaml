@@ -1,0 +1,137 @@
+# Home Assistant "package" for receiving telemetry from the IoniqHA app.
+# English version of ioniq_package.yaml - use ONE of the two, not both
+# (they share the same webhook_id and unique_ids).
+#
+# Setup:
+# 1. Enable packages in configuration.yaml, if you don't have it already:
+#      homeassistant:
+#        packages: !include_dir_named packages
+# 2. Save this file as packages/ioniq.yaml (or !include it directly).
+# 3. In the IoniqHA app, set the webhook URL to:
+#      http://<your HA IP>:8123/api/webhook/ioniq-soc
+#    (the webhook_id stays "ioniq-soc" regardless of the entity names below -
+#    changing it would mean re-typing the URL in the app on the car's
+#    touchscreen.)
+# 4. Restart Home Assistant.
+#
+# After restarting you'll see entities named IoniqHA_..., e.g.:
+#   sensor.ioniqha_soc, sensor.ioniqha_speed, sensor.ioniqha_charging,
+#   sensor.ioniqha_ext_temp, sensor.ioniqha_power, sensor.ioniqha_range,
+#   sensor.ioniqha_odometer, sensor.ioniqha_drive_mode, ...
+#
+# Location (lat/lon) only arrives when the app currently has GPS from the
+# car's navigation.
+#
+# Note on the extra fields (drive_mode, avg_efficiency, used_efficiency,
+# charge_limit_percent, range_add_km, battery_level, battery_percent_alt,
+# evse_fault_flag, driving_lockout, inner_temp): drive_mode, efficiency,
+# charge limit and the extra range are fairly confident matches based on
+# the method signatures. battery_level/battery_percent_alt/evse_fault_flag/
+# driving_lockout are less certain - the app sends them (when the vehicle
+# can be read), but verify the exact meaning/units against real values.
+
+template:
+  - trigger:
+      - trigger: webhook
+        webhook_id: ioniq-soc
+        allowed_methods: [POST]
+        # local_only disabled so the app can also send from outside the
+        # home network (port forward/DuckDNS), not just the local WiFi.
+        # The webhook has no authentication either way (normal for HA
+        # webhooks) - security relies on the attacker having to guess the
+        # exact webhook_id, not on network access.
+        local_only: false
+    sensor:
+      - name: "IoniqHA last payload"
+        unique_id: ioniqha_last_payload
+        state: "{{ now().isoformat() }}"
+        attributes:
+          soc: "{{ trigger.json.soc }}"
+          speed: "{{ trigger.json.speed }}"
+          is_charging: "{{ trigger.json.is_charging }}"
+          ext_temp: "{{ trigger.json.ext_temp }}"
+          power: "{{ trigger.json.power }}"
+          range_km: "{{ trigger.json.range_km | default(none) }}"
+          odometer_km: "{{ trigger.json.odometer_km | default(none) }}"
+          lat: "{{ trigger.json.lat | default(none) }}"
+          lon: "{{ trigger.json.lon | default(none) }}"
+          drive_mode: "{{ trigger.json.drive_mode | default(none) }}"
+          avg_efficiency: "{{ trigger.json.avg_efficiency | default(none) }}"
+          used_efficiency: "{{ trigger.json.used_efficiency | default(none) }}"
+          charge_limit_percent: "{{ trigger.json.charge_limit_percent | default(none) }}"
+          range_add_km: "{{ trigger.json.range_add_km | default(none) }}"
+          battery_level: "{{ trigger.json.battery_level | default(none) }}"
+          battery_percent_alt: "{{ trigger.json.battery_percent_alt | default(none) }}"
+          evse_fault_flag: "{{ trigger.json.evse_fault_flag | default(none) }}"
+          driving_lockout: "{{ trigger.json.driving_lockout | default(none) }}"
+          inner_temp: "{{ trigger.json.inner_temp | default(none) }}"
+
+  - sensor:
+      - name: "IoniqHA SoC"
+        unique_id: ioniqha_soc
+        unit_of_measurement: "%"
+        device_class: battery
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'soc') }}"
+      - name: "IoniqHA Speed"
+        unique_id: ioniqha_speed
+        unit_of_measurement: "km/h"
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'speed') }}"
+      - name: "IoniqHA Charging"
+        unique_id: ioniqha_charging
+        state: >
+          {{ 'Charging' if state_attr('sensor.ioniqha_last_payload', 'is_charging') == 1 else 'Not charging' }}
+      - name: "IoniqHA Outside Temperature"
+        unique_id: ioniqha_ext_temp
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'ext_temp') }}"
+      - name: "IoniqHA Power"
+        unique_id: ioniqha_power
+        unit_of_measurement: "kW"
+        device_class: power
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'power') }}"
+      - name: "IoniqHA Range"
+        unique_id: ioniqha_dojezd
+        unit_of_measurement: "km"
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'range_km') }}"
+      - name: "IoniqHA Odometer"
+        unique_id: ioniqha_najezd
+        unit_of_measurement: "km"
+        state_class: total_increasing
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'odometer_km') }}"
+
+      # --- New fields added 2026-11-17 ---
+      - name: "IoniqHA Drive Mode"
+        unique_id: ioniqha_drive_mode
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'drive_mode') }}"
+      - name: "IoniqHA Average Efficiency"
+        unique_id: ioniqha_avg_efficiency
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'avg_efficiency') }}"
+      - name: "IoniqHA Current Efficiency"
+        unique_id: ioniqha_used_efficiency
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'used_efficiency') }}"
+      - name: "IoniqHA Charge Limit"
+        unique_id: ioniqha_charge_limit
+        unit_of_measurement: "%"
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'charge_limit_percent') }}"
+      - name: "IoniqHA Extra Range"
+        unique_id: ioniqha_range_add
+        unit_of_measurement: "km"
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'range_add_km') }}"
+      - name: "IoniqHA Battery Level (unverified)"
+        unique_id: ioniqha_battery_level
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'battery_level') }}"
+      - name: "IoniqHA Battery Percent Alt (unverified)"
+        unique_id: ioniqha_battery_percent_alt
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'battery_percent_alt') }}"
+      - name: "IoniqHA EVSE Fault Flag (unverified)"
+        unique_id: ioniqha_evse_fault
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'evse_fault_flag') }}"
+      - name: "IoniqHA Driving Lockout (unverified)"
+        unique_id: ioniqha_driving_lockout
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'driving_lockout') }}"
+      - name: "IoniqHA Inner Temperature"
+        unique_id: ioniqha_inner_temp
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: "{{ state_attr('sensor.ioniqha_last_payload', 'inner_temp') }}"
