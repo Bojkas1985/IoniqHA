@@ -6,6 +6,38 @@ g4rb4g3. Místo posílání dat do ABRP posílá SoC (a pár dalších hodnot) r
 do Home Assistanta přes webhook. Žádný OBD dongle, žádný telefon, žádné ABRP
 konto - čte přímo z LGE IVI frameworku, co už běží na head-unitu.
 
+*A minimalist app for the Hyundai Ioniq Electric (28kWh) head unit, inspired
+by [ABRPTransmitter](https://github.com/g4rb4g3/ABRPTransmitter) by g4rb4g3.
+Instead of sending data to ABRP, it posts SoC (and a few other values)
+straight to Home Assistant via a webhook. No OBD dongle, no phone, no ABRP
+account required - it reads directly from the LGE IVI framework already
+running on the head unit.*
+
+## Screenshoty appky / App screenshots
+
+| Nastavení (CZ) / Settings (EN) | Debug (CZ) / Debug (EN) |
+|---|---|
+| ![Nastavení](docs/screenshots/screenshot_settings.png) | ![Debug](docs/screenshots/screenshot_debug.png) |
+
+**CZ:** Záložka "Nastavení" - webhook URL (lokální nebo přes Nabu Casa),
+přepínač "Posílat data", tlačítka "Uložit", "Odeslat teď" a "Načíst URL z
+USB". Záložka "Debug" ukazuje čas posledního úspěšného odeslání a poslední
+chybu (včetně typu výjimky), ať appku jde kontrolovat přímo na displeji auta
+bez notebooku a `adb logcat`.
+
+**EN:** The "Nastavení" (Settings) tab holds the webhook URL (local or via
+Nabu Casa), the "Posílat data" (Send data) toggle, and the "Uložit" (Save),
+"Odeslat teď" (Send now) and "Načíst URL z USB" (Load URL from USB) buttons.
+The "Debug" tab shows the last successful send time and the last error
+(including the exception type), so the app can be checked right on the car's
+display without a laptop or `adb logcat`.
+
+*(Pozn.: appka nemá anglickou lokalizaci, UI je jen česky - screenshoty výše
+jsou mírně zjednodušená rekonstrukce reálného vzhledu, ne přímý snímek
+obrazovky z auta. / Note: the app has no English localization, the UI is
+Czech-only - the screenshots above are a slightly simplified reconstruction
+of the real look, not a direct screen capture from the car.)*
+
 ## Co appka posílá
 
 Každých 5 vteřin (pokud je head-unit připojený na WiFi a v appce je zapnuté
