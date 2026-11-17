@@ -19,14 +19,14 @@ running on the head unit.*
 |---|---|
 | ![Nastavení](docs/screenshots/screenshot_settings.png) | ![Debug](docs/screenshots/screenshot_debug.png) |
 
-**CZ:** Záložka "Nastavení" - webhook URL (lokální nebo přes Nabu Casa),
-přepínač "Posílat data", tlačítka "Uložit", "Odeslat teď" a "Načíst URL z
-USB". Záložka "Debug" ukazuje čas posledního úspěšného odeslání a poslední
-chybu (včetně typu výjimky), ať appku jde kontrolovat přímo na displeji auta
-bez notebooku a `adb logcat`.
+**CZ:** Záložka "Nastavení" - webhook URL, přepínač "Posílat data",
+tlačítka "Uložit", "Odeslat teď" a "Načíst URL z USB". Záložka "Debug"
+ukazuje čas posledního úspěšného odeslání a poslední chybu (včetně typu
+výjimky), ať appku jde kontrolovat přímo na displeji auta bez notebooku a
+`adb logcat`.
 
-**EN:** The "Nastavení" (Settings) tab holds the webhook URL (local or via
-Nabu Casa), the "Posílat data" (Send data) toggle, and the "Uložit" (Save),
+**EN:** The "Nastavení" (Settings) tab holds the webhook URL, the
+"Posílat data" (Send data) toggle, and the "Uložit" (Save),
 "Odeslat teď" (Send now) and "Načíst URL z USB" (Load URL from USB) buttons.
 The "Debug" tab shows the last successful send time and the last error
 (including the exception type), so the app can be checked right on the car's
@@ -181,23 +181,13 @@ Všechno nové je stejně jako dojezd/nájezd čtené s vlastním try/catch, tak
 pokud se některé pole u tvého vozidla nepodaří přečíst, zbytek telemetrie to
 neovlivní - prostě ten atribut/sensor zůstane prázdný.
 
-## Vzdálený přístup (Nabu Casa) - aby to mohl používat i někdo jiný
+## Vzdálený přístup (Nabu Casa) - nefunguje
 
-Appka má teď (`TLSSocketFactory`) podporu pro HTTPS webhook, ne jen lokální
-HTTP - takže webhook URL nemusí být jen "doma na WiFi", ale klidně i
-veřejná adresa, pokud má daný člověk Home Assistant Cloud (Nabu Casa).
-
-Nejspolehlivější cesta je **cloudhook**, ne obecná remote UI adresa:
-Nastavení → Home Assistant Cloud → Webhooks → najdi/zapni webhook pro svou
-automatizaci → zkopíruj vygenerovanou `https://hooks.nabu.casa/...` adresu a
-tu vlož do appky. Tahle adresa funguje odkudkoli, appka pak nemusí čekat na
-domácí WiFi ani na hotspot z telefonu - stačí jakékoli připojení k internetu
-(viz diskuze o Android Auto/hotspotu výš - cloudhook by ve výsledku vyřešil i
-to posílání za jízdy, pokud by head-unit měl connectivity).
-
-Starý Android na head-unitu (API 17) by bez `TLSSocketFactory` HTTPS
-handshake na moderní server nejspíš odmítl - proto je zapnutí TLSv1.1/1.2
-součástí appky už teď, ne až jako dodatečná oprava.
+Nabu Casa (HTTPS) se vyzkoušet nepodařilo rozchodit - starý Android na
+head-unitu (API 17) neumí spolehlivě TLS SNI, které Nabu Casa pro
+směrování vyžaduje, takže spojení vždy padá. Případné budoucí řešení by
+šlo cestou obyčejného HTTP (bez TLS) přes vlastní port forward/DDNS,
+nebo přes jiný transport (např. relay přes telefon) - zatím neřešeno.
 
 ## "Debugger" v appce
 
@@ -230,8 +220,6 @@ soubor bez ohledu na přesnou cestu mountu.
 - **Android Auto / telefon** - appka běží čistě na head-unitu, bez závislosti
   na telefonu. Za jízdy bez domácí WiFi/hotspotu z telefonu appka neodesílá
   nic (poloha se v appce drží v paměti, ale nikam neposílá, dokud není WiFi).
-- **HTTPS s moderním TLS** - appka počítá s obyčejným HTTP webhookem v
-  domácí síti. Pokud bys chtěl posílat ven přes internet (např. Nabu Casa
-  HTTPS endpoint), stará Android verze na head-unitu (API 17) může mít
-  problém s moderním TLS - řešilo by se to stejnou záplatou
-  (`TLSSocketFactory`), jakou měl originální ABRPTransmitter.
+- **HTTPS s moderním TLS (Nabu Casa)** - vyzkoušeno a nefunguje spolehlivě,
+  viz sekce "Vzdálený přístup (Nabu Casa)" výše včetně fungující náhrady
+  přes obyčejné HTTP + DuckDNS.
