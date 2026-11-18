@@ -1,6 +1,6 @@
 ## Support
 
-If IoniqHA is useful to you, you can [sponsor me on GitHub](https://github.com/sponsors/Bojkas1985) ☕
+If IoniqHA is useful to you, you can [Buy me a coffee](https://github.com/sponsors/Bojkas1985) ☕
 
 # IoniqHA
 
