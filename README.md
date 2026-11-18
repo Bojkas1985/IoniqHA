@@ -1,3 +1,7 @@
+## Support
+
+If IoniqHA is useful to you, you can [sponsor me on GitHub](https://github.com/sponsors/Bojkas1985) ☕
+
 # IoniqHA
 
 > ⚠️ **Disclaimer:** Jde o neoficiální, experimentální hobby projekt jednoho
