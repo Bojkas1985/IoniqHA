@@ -1,6 +1,6 @@
 # IoniqHA
 
-[![Sponsor](https://img.shields.io/badge/Sponsor-❤-ea4aaa?logo=github)](https://github.com/sponsors/Bojkas1985)
+[![Buy me a coffee](https://img.shields.io/badge/Sponsor-❤-ea4aaa?logo=github)](https://github.com/sponsors/Bojkas1985)
 
 > ⚠️ **Disclaimer:** Jde o neoficiální, experimentální hobby projekt jednoho
 > uživatele, nijak nesouvisející s Hyundai/Kia/LGE. Appka byla odladěná a
